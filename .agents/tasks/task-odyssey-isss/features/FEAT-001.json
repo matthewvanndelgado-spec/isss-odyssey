@@ -1,0 +1,53 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Project scaffolding with Next.js 14, TypeScript, Tailwind CSS, shadcn/ui, tRPC, Prisma, NextAuth.js. Includes complete database schema, authentication system, design system tokens, and base layout components.",
+  "status": "completed",
+  "steps": [
+    "Initialize Next.js 14 project with TypeScript and App Router in /projects/sandbox using 'npx create-next-app@14 . --typescript --tailwind --eslint --app --src-dir --import-alias @/*'",
+    "Install all dependencies: @trpc/server @trpc/client @trpc/react-query @trpc/next @tanstack/react-query zod next-auth @auth/prisma-adapter prisma @prisma/client bcryptjs superjson class-variance-authority clsx tailwind-merge lucide-react @radix-ui/react-slot @radix-ui/react-dialog @radix-ui/react-dropdown-menu @radix-ui/react-avatar @radix-ui/react-select @radix-ui/react-tabs @radix-ui/react-toast @radix-ui/react-label @radix-ui/react-separator @radix-ui/react-popover @radix-ui/react-calendar date-fns openai tailwindcss-animate",
+    "Install dev dependencies: @types/bcryptjs",
+    "Configure tailwind.config.ts with UB brand colors (primary: #8B1A1A deep red/maroon, accent: #DAA520 gold), Inter font, custom spacing, animations, and shadcn/ui theme variables following CSS variables pattern",
+    "Create src/lib/utils.ts with cn() helper using clsx + tailwind-merge",
+    "Set up shadcn/ui components: Create src/components/ui/ directory with Button, Card, Input, Label, Badge, Avatar, Select, Textarea, Dialog, DropdownMenu, Tabs, Toast, Separator, Sheet, Skeleton, ScrollArea components following shadcn/ui patterns with CVA variants",
+    "Create prisma/schema.prisma with SQLite datasource for local dev. Define ALL entities: User (id, email, passwordHash, role enum STUDENT/STAFF, firstName, lastName, nationality, studentId, createdAt, updatedAt), Announcement (id, title, content, authorId->User, publishedAt, isActive), Inquiry (id, studentId->User, category, subject, description, status enum PENDING/IN_PROGRESS/RESPONDED/CLOSED, createdAt), InquiryResponse (id, inquiryId->Inquiry, staffId->User, responseText, createdAt), Appointment (id, studentId->User, staffId->User, type enum ONLINE/FACE_TO_FACE, date, timeSlot, purpose, status enum PENDING/CONFIRMED/CANCELLED/COMPLETED, meetingLink, createdAt), StaffAvailability (id, staffId->User, date, timeSlots Json, isAvailable), VisaRecord (id, studentId->User, visaType, status enum VALID/EXPIRING_SOON/EXPIRED/PENDING_RENEWAL, expiryDate, notes, updatedAt, createdAt), VisaDocument (id, visaRecordId->VisaRecord, documentType, fileName, fileUrl, status enum PENDING/APPROVED/REJECTED, uploadedAt), ExchangeProgram (id, title, description, type enum ACADEMIC/CULTURAL/MOBILITY, eligibility, deadline, applicationUrl, isArchived, createdAt, updatedAt), ExchangeProgramApplication (id, programId->ExchangeProgram, studentId->User, status, appliedAt), OrientationContent (id, category enum ACADEMIC/CULTURAL/SAFETY_EMERGENCY/STUDENT_LIFE/ABOUT_UB_ISSO, title, content, order, isPublished, createdAt, updatedAt), ChatMessage (id, studentId->User, role enum USER/ASSISTANT, content, language, createdAt), Notification (id, userId->User, type, title, message, isRead, link, createdAt)",
+    "Run npx prisma generate to create Prisma client",
+    "Create src/server/db.ts with PrismaClient singleton pattern (globalThis caching for dev hot reload)",
+    "Set up NextAuth.js configuration in src/server/auth.ts: CredentialsProvider with email/password, bcrypt comparison, JWT strategy, session callback with user role/id, custom pages for login/register",
+    "Create src/app/api/auth/[...nextauth]/route.ts exporting GET and POST handlers",
+    "Set up tRPC: Create src/server/trpc/trpc.ts (initTRPC with superjson transformer, context with session/db), src/server/trpc/context.ts (createContext function), src/server/trpc/router.ts (appRouter placeholder with auth/inquiry/appointment/visa/exchange/orientation/chat/notification sub-routers as empty stubs)",
+    "Create src/app/api/trpc/[trpc]/route.ts with fetchRequestHandler",
+    "Create src/lib/trpc/client.ts with createTRPCReact and provider setup, src/lib/trpc/server.ts for server-side caller",
+    "Create src/app/providers.tsx with TRPCProvider, SessionProvider, QueryClientProvider, and ThemeProvider wrappers",
+    "Create src/app/layout.tsx root layout with Inter font (Google Fonts via next/font), metadata for ODYSSEY ISSS, Providers wrapper, and global styles",
+    "Create src/app/globals.css with Tailwind directives, CSS variables for UB brand colors in both light/dark themes, custom scrollbar styles, and smooth transitions",
+    "Create src/components/shared/Sidebar.tsx - responsive sidebar navigation with role-based menu items (Dashboard, Inquiries, Appointments, Visa Tracking, Exchange Programs, Orientation, AI Assistant for students; add Staff Management items for ISSO role)",
+    "Create src/components/shared/Header.tsx - top header with user avatar dropdown, notifications bell with badge count, mobile menu toggle",
+    "Create src/components/shared/PageHeader.tsx - reusable page header with title, description, and optional action buttons",
+    "Create src/app/(dashboard)/layout.tsx - authenticated layout with Sidebar + Header + main content area with proper responsive grid",
+    "Create src/app/(auth)/layout.tsx - centered auth layout with UB branding and gradient background",
+    "Create .env.example with DATABASE_URL (file:./dev.db), NEXTAUTH_SECRET, NEXTAUTH_URL, OPENAI_API_KEY, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_S3_BUCKET, AWS_REGION placeholders",
+    "Create .env with SQLite DATABASE_URL and dummy NEXTAUTH_SECRET for local dev",
+    "Run npx prisma db push to create SQLite database",
+    "Verify: Run npm run build to confirm zero TypeScript errors and successful compilation"
+  ],
+  "acceptance_criteria": [
+    "npm run build completes successfully with zero errors",
+    "npx prisma generate produces client without errors",
+    "npx prisma db push creates SQLite database successfully",
+    "All 13+ database models defined in schema.prisma with proper relations",
+    "tailwind.config.ts has UB brand colors (#8B1A1A primary, #DAA520 accent) configured",
+    "NextAuth.js credentials auth configured with JWT strategy",
+    "tRPC router structure created with type-safe client/server setup",
+    "shadcn/ui components created in src/components/ui/ with proper CVA variants",
+    "Responsive sidebar and header layout components exist",
+    "Auth pages layout with UB branding exists"
+  ],
+  "verification": [
+    "npx prisma generate",
+    "npx prisma db push --accept-data-loss",
+    "npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": "1. Prisma v7 (latest) has breaking changes with datasource URL config - used Prisma v5 which is stable and works with SQLite url in schema. 2. tRPC v10 requires transformer at top-level createClient(), not inside httpBatchLink. 3. ESLint in Next.js 14 now enforces @typescript-eslint/no-empty-object-type - use type aliases instead of empty interfaces. 4. Top-level await not supported in Next.js modules without specific tsconfig - use async function wrapper for server-side tRPC caller. 5. @auth/prisma-adapter installed but not used (credentials-only auth uses JWT, not database sessions). 6. @radix-ui/react-scroll-area had to be installed separately (not included in original deps list)."
+}

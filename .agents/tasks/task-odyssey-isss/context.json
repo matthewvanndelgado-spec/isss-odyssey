@@ -1,0 +1,28 @@
+{
+  "project_type": "Next.js 14 full-stack TypeScript application with tRPC, Prisma, and shadcn/ui",
+  "language": "TypeScript",
+  "build_system": "npm with Next.js build toolchain, Prisma CLI for database migrations",
+  "test_framework": "Vitest for unit tests, Playwright for E2E (if time allows)",
+  "build_command": "npm run build",
+  "test_command": "npx prisma generate && npm run build",
+  "verification_instructions": "1. Run npx prisma generate to ensure schema is valid. 2. Run npm run build to confirm no TypeScript errors. 3. Run npm run lint to check code quality.",
+  "snapshot_or_generated_files": "prisma/generated/ - regenerated via npx prisma generate. node_modules/.prisma/client - auto-generated Prisma client.",
+  "setup_instructions": "1. npm install. 2. Copy .env.example to .env. 3. npx prisma generate. 4. npx prisma db push. 5. npx prisma db seed. 6. npm run dev.",
+  "environment_constraints": "OPEN_INTERNET - full access to npm registry. Using SQLite for local dev via Prisma (production would use PostgreSQL + pgvector on AWS RDS). Node.js v22 available.",
+  "contribution_requirements": "Capstone project - production-quality code, clean architecture, comprehensive error handling, accessibility compliance WCAG 2.1 AA.",
+  "key_patterns": "Next.js App Router with route groups for auth/dashboard, tRPC with routers per module, Prisma schema with relations, shadcn/ui components with Tailwind CSS, NextAuth.js credentials provider with JWT sessions, Zod validation schemas co-located with tRPC routers.",
+  "relevant_files": [
+    "src/app/(auth)/login/page.tsx",
+    "src/app/(auth)/register/page.tsx",
+    "src/app/(dashboard)/layout.tsx",
+    "src/app/api/trpc/[trpc]/route.ts",
+    "src/server/trpc/router.ts",
+    "src/server/auth.ts",
+    "prisma/schema.prisma",
+    "prisma/seed.ts",
+    "src/components/ui/",
+    "src/lib/ai/chat.ts",
+    "tailwind.config.ts"
+  ],
+  "directory_structure": "src/app/ - Next.js App Router pages and layouts. src/server/ - tRPC routers, auth config, business logic. src/components/ - React components (ui/ for shadcn, shared/ for app-wide). src/lib/ - utility functions, AI integration, S3 helpers. prisma/ - schema and migrations. public/ - static assets."
+}

@@ -1,0 +1,225 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User model - supports both Student and ISSO Staff roles
+// role: "STUDENT" | "STAFF"
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STUDENT") // Valid values: STUDENT, STAFF
+  firstName    String
+  lastName     String
+  nationality  String?
+  studentId    String?  @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  announcements              Announcement[]
+  inquiriesAsStudent         Inquiry[]              @relation("StudentInquiries")
+  inquiryResponses           InquiryResponse[]
+  appointmentsAsStudent      Appointment[]          @relation("StudentAppointments")
+  appointmentsAsStaff        Appointment[]          @relation("StaffAppointments")
+  staffAvailabilities        StaffAvailability[]
+  visaRecords                VisaRecord[]
+  exchangeProgramApplications ExchangeProgramApplication[]
+  chatMessages               ChatMessage[]
+  notifications              Notification[]
+}
+
+// Announcements posted by ISSO staff
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  authorId    String
+  publishedAt DateTime @default(now())
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author User @relation(fields: [authorId], references: [id])
+}
+
+// Student inquiries/tickets
+// status: "PENDING" | "IN_PROGRESS" | "RESPONDED" | "CLOSED"
+model Inquiry {
+  id          String   @id @default(cuid())
+  studentId   String
+  category    String
+  subject     String
+  description String
+  status      String   @default("PENDING") // Valid values: PENDING, IN_PROGRESS, RESPONDED, CLOSED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  student   User              @relation("StudentInquiries", fields: [studentId], references: [id])
+  responses InquiryResponse[]
+}
+
+// Staff responses to inquiries
+model InquiryResponse {
+  id           String   @id @default(cuid())
+  inquiryId    String
+  staffId      String
+  responseText String
+  createdAt    DateTime @default(now())
+
+  // Relations
+  inquiry Inquiry @relation(fields: [inquiryId], references: [id])
+  staff   User    @relation(fields: [staffId], references: [id])
+}
+
+// Appointment scheduling
+// type: "ONLINE" | "FACE_TO_FACE"
+// status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED"
+model Appointment {
+  id          String   @id @default(cuid())
+  studentId   String
+  staffId     String
+  type        String   @default("ONLINE") // Valid values: ONLINE, FACE_TO_FACE
+  date        DateTime
+  timeSlot    String
+  purpose     String
+  status      String   @default("PENDING") // Valid values: PENDING, CONFIRMED, CANCELLED, COMPLETED
+  meetingLink String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  student User @relation("StudentAppointments", fields: [studentId], references: [id])
+  staff   User @relation("StaffAppointments", fields: [staffId], references: [id])
+}
+
+// Staff availability for appointments
+model StaffAvailability {
+  id          String   @id @default(cuid())
+  staffId     String
+  date        DateTime
+  timeSlots   String   // JSON string array of available time slots
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  staff User @relation(fields: [staffId], references: [id])
+}
+
+// Visa tracking records
+// status: "VALID" | "EXPIRING_SOON" | "EXPIRED" | "PENDING_RENEWAL"
+model VisaRecord {
+  id         String   @id @default(cuid())
+  studentId  String
+  visaType   String
+  status     String   @default("VALID") // Valid values: VALID, EXPIRING_SOON, EXPIRED, PENDING_RENEWAL
+  expiryDate DateTime
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  student   User           @relation(fields: [studentId], references: [id])
+  documents VisaDocument[]
+}
+
+// Visa-related documents
+// status: "PENDING" | "APPROVED" | "REJECTED"
+model VisaDocument {
+  id           String   @id @default(cuid())
+  visaRecordId String
+  documentType String
+  fileName     String
+  fileUrl      String
+  status       String   @default("PENDING") // Valid values: PENDING, APPROVED, REJECTED
+  uploadedAt   DateTime @default(now())
+
+  // Relations
+  visaRecord VisaRecord @relation(fields: [visaRecordId], references: [id])
+}
+
+// Exchange programs
+// type: "ACADEMIC" | "CULTURAL" | "MOBILITY"
+model ExchangeProgram {
+  id             String   @id @default(cuid())
+  title          String
+  description    String
+  type           String   @default("ACADEMIC") // Valid values: ACADEMIC, CULTURAL, MOBILITY
+  eligibility    String?
+  deadline       DateTime?
+  applicationUrl String?
+  isArchived     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  applications ExchangeProgramApplication[]
+}
+
+// Student applications to exchange programs
+// status: "PENDING" | "ACCEPTED" | "REJECTED" | "WITHDRAWN"
+model ExchangeProgramApplication {
+  id        String   @id @default(cuid())
+  programId String
+  studentId String
+  status    String   @default("PENDING") // Valid values: PENDING, ACCEPTED, REJECTED, WITHDRAWN
+  appliedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  program ExchangeProgram @relation(fields: [programId], references: [id])
+  student User            @relation(fields: [studentId], references: [id])
+}
+
+// Orientation center content
+// category: "ACADEMIC" | "CULTURAL" | "SAFETY_EMERGENCY" | "STUDENT_LIFE" | "ABOUT_UB_ISSO"
+model OrientationContent {
+  id          String   @id @default(cuid())
+  category    String   // Valid values: ACADEMIC, CULTURAL, SAFETY_EMERGENCY, STUDENT_LIFE, ABOUT_UB_ISSO
+  title       String
+  content     String
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// AI chatbot messages
+// role: "USER" | "ASSISTANT"
+model ChatMessage {
+  id        String   @id @default(cuid())
+  studentId String
+  role      String   // Valid values: USER, ASSISTANT
+  content   String
+  language  String   @default("en")
+  createdAt DateTime @default(now())
+
+  // Relations
+  student User @relation(fields: [studentId], references: [id])
+}
+
+// User notifications
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+}

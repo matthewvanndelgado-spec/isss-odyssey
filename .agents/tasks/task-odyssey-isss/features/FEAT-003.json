@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Inquiry System and Appointment Scheduling modules - complete CRUD operations, student and staff views, real-time status tracking, and appointment booking with staff availability.",
+  "status": "completed",
+  "steps": [
+    "Create src/server/trpc/routers/inquiry.ts - inquiry router: create mutation (studentId, category enum [VISA/ACADEMIC/FINANCIAL/HOUSING/GENERAL], subject, description, Zod validation), getAll query (filtered by role - students see own, staff see all, pagination, status filter, search), getById query, respond mutation (staff only - creates InquiryResponse, updates inquiry status), updateStatus mutation (staff only), delete mutation (soft delete or hard delete by staff)",
+    "Create src/app/(dashboard)/inquiries/page.tsx - Student inquiry list view: filter tabs (All/Pending/Responded/Closed), search input, create new inquiry button, inquiry cards with status badges (color-coded), category tags, date, click to expand/view detail",
+    "Create src/app/(dashboard)/inquiries/new/page.tsx - Create inquiry form: category dropdown, subject input, rich description textarea with character count, file attachment placeholder (for future S3 integration), submit with loading state, success toast and redirect",
+    "Create src/app/(dashboard)/inquiries/[id]/page.tsx - Inquiry detail view: full inquiry info at top, conversation thread below showing student message and staff responses in chat-like timeline, staff can type and submit response at bottom (only if role is STAFF), status badge with history",
+    "Create src/app/(dashboard)/staff/inquiries/page.tsx - Staff inquiry management: table/list view with all student inquiries, sortable columns (date, status, category, student), bulk actions (mark responded), quick-respond inline, click to open detail view",
+    "Create src/server/trpc/routers/appointment.ts - appointment router: create mutation (studentId, staffId, type ONLINE/FACE_TO_FACE, date, timeSlot, purpose, Zod validation, conflict check), getAll query (role-filtered, date range filter, status filter), getById query, updateStatus mutation (staff - confirm/cancel/complete), getAvailableSlots query (staffId + date -> returns available time slots), cancel mutation (student can cancel own pending appointments)",
+    "Create src/server/trpc/routers/availability.ts - availability router: setAvailability mutation (staff sets available dates/time slots as JSON array), getMyAvailability query (staff views own schedule), getStaffAvailability query (students can see a staff member's open slots for booking)",
+    "Create src/app/(dashboard)/appointments/page.tsx - Student appointment view: upcoming appointments list with date/time/type/status, past appointments section, 'Book New' button, calendar mini-view showing booked dates highlighted",
+    "Create src/app/(dashboard)/appointments/book/page.tsx - Booking flow: Step 1 select consultation type (Online/F2F), Step 2 select staff member from available list, Step 3 pick date from calendar showing available dates, Step 4 pick time slot from available slots for that date, Step 5 enter purpose/notes, confirmation summary, submit with loading state",
+    "Create src/app/(dashboard)/staff/appointments/page.tsx - Staff appointment management: calendar/agenda view of all appointments, today's appointments highlighted, confirm/cancel actions on pending appointments, view student info on each appointment",
+    "Create src/app/(dashboard)/staff/availability/page.tsx - Staff availability management: calendar interface to set available days, time slot grid (9AM-5PM in 30min increments) to toggle available slots per day, bulk set for recurring availability, save changes",
+    "Wire up inquiry and appointment routers in main appRouter",
+    "Verify: npm run build passes with all new pages"
+  ],
+  "acceptance_criteria": [
+    "Students can create inquiries with category, subject, and description",
+    "Students see their own inquiries filtered by status with proper badges",
+    "Staff can view all inquiries and respond with text responses",
+    "Inquiry detail shows conversation thread between student and staff",
+    "Appointment booking flow has multi-step wizard with date/time/staff selection",
+    "Available time slots are correctly filtered based on staff availability settings",
+    "Staff can manage their availability by date and time slots",
+    "Staff can confirm/cancel appointments with status updates",
+    "All tRPC routers have Zod input validation",
+    "npm run build completes successfully"
+  ],
+  "verification": [
+    "npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": "Zod v4 uses {message: ...} instead of {required_error: ...} for enum params. Build and lint pass cleanly. staffProcedure exists in trpc.ts and works for staff-only operations. Used trpc.useUtils() for invalidation after mutations."
+}

@@ -1,0 +1,42 @@
+{
+  "id": "FEAT-005",
+  "type": "feat",
+  "description": "Orientation Center module, AI-Powered Multilingual Assistant with conversational chat widget, database seed data for all modules, and final polish/integration.",
+  "status": "completed",
+  "steps": [
+    "Create src/server/trpc/routers/orientation.ts - orientation router: getAll query (optionally filtered by category, ordered by order field), getByCategory query (returns content for a specific category), getById query, create mutation (staff - title, category, content, order), update mutation (staff), delete mutation (staff), reorder mutation (staff - update order fields)",
+    "Create src/app/(dashboard)/orientation/page.tsx - Orientation center main page: category tabs/pills at top (Academic, Cultural, Safety & Emergency, Student Life, About UB/ISSO) with icons for each, content cards grid below filtered by selected category, each card shows title and content preview with 'Read More' expansion, smooth tab transition animations, search across all orientation content",
+    "Create src/app/(dashboard)/orientation/[id]/page.tsx - Single orientation content page: full content display with rich formatting (headers, lists, bold), breadcrumb navigation back to category, previous/next content navigation, last updated date",
+    "Create src/app/(dashboard)/staff/orientation/page.tsx - Staff orientation management: categorized list of all content, drag-to-reorder within category (or manual order input), create/edit/delete actions, content preview",
+    "Create src/app/(dashboard)/staff/orientation/new/page.tsx - Create/Edit orientation content: category dropdown, title input, rich content textarea (with markdown-like formatting hints), order number, publish toggle, save with validation",
+    "Create src/lib/ai/openai.ts - OpenAI client setup: initialize OpenAI client with API key from env, system prompt template for ISSO multilingual assistant (knows about UB, ISSO services, visa processes, Filipino/Korean/Chinese culture context), streaming response utility function, language detection helper",
+    "Create src/lib/ai/rag.ts - RAG pipeline stub: function to embed query text (placeholder for pgvector in production), function to search similar documents (returns mock relevant context for SQLite dev mode), function to build augmented prompt with retrieved context, note about pgvector integration for production",
+    "Create src/server/trpc/routers/chat.ts - chat router: sendMessage mutation (takes content + language, calls OpenAI with conversation history + RAG context, saves user message and assistant response to DB, returns assistant response), getHistory query (paginated chat history for student), clearHistory mutation, detectLanguage query (utility to detect input language)",
+    "Create src/app/(dashboard)/assistant/page.tsx - Full-page AI chat interface: chat message list with user/assistant bubbles (different alignment and colors), language selector dropdown (English/Filipino/Korean/Chinese) at top, message input with send button at bottom, streaming response display with typing indicator animation, suggested quick questions as chips above input ('How do I renew my visa?', 'What documents do I need?', 'Tell me about exchange programs'), empty state with welcome message and capabilities list, auto-scroll to latest message",
+    "Create src/components/shared/ChatWidget.tsx - Floating chat widget (optional mini version): fixed bottom-right button with chat icon + pulse animation, expandable chat panel overlaying page content, same chat functionality as full page but in compact form, close/minimize button, drag handle for repositioning",
+    "Create prisma/seed.ts - comprehensive seed script: 1) Create admin staff user (staff@ub.edu.ph / password123), 2) Create 3 sample students with different nationalities (Korean, Chinese, Filipino), 3) Create 5 announcements covering visa deadlines, orientation schedule, new programs, office hours, emergency contacts, 4) Create sample inquiries in various statuses with responses, 5) Create sample appointments (upcoming and past), 6) Create staff availability for next 2 weeks, 7) Create visa records for each student (one valid, one expiring soon, one with missing documents), 8) Create visa document records, 9) Create 6 exchange programs (2 Academic, 2 Cultural, 2 Mobility) with real-sounding details, 10) Create orientation content for each category (at least 3 items per category with realistic educational content about UB and ISSO), 11) Create sample notifications, 12) Create sample chat messages showing multilingual conversation",
+    "Add prisma seed script configuration to package.json (prisma.seed field pointing to ts-node prisma/seed.ts), install ts-node and tsconfig-paths as dev dependencies",
+    "Create src/app/(dashboard)/staff/announcements/page.tsx - Staff announcement management: list of all announcements with active/inactive toggle, create new, edit, delete",
+    "Create src/app/page.tsx - Landing/home page that redirects to /dashboard if authenticated or /login if not",
+    "Run final verification: npx prisma db push && npx prisma db seed && npm run build",
+    "Verify: npm run build passes, seed runs successfully, all routes compile"
+  ],
+  "acceptance_criteria": [
+    "Orientation center displays categorized content with tab navigation",
+    "Staff can create, edit, reorder, and delete orientation content",
+    "AI assistant page has full chat interface with message bubbles and input",
+    "Chat router integrates with OpenAI (gracefully handles missing API key)",
+    "Language selector offers English/Filipino/Korean/Chinese options",
+    "Seed script creates realistic demo data for ALL modules",
+    "Seed script runs without errors: npx prisma db seed",
+    "Landing page redirects appropriately based on auth state",
+    "Staff announcement management page exists with CRUD operations",
+    "npm run build completes successfully with all features integrated"
+  ],
+  "verification": [
+    "npx prisma db push --accept-data-loss",
+    "npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": "All features implemented and verified. Build passes, seed runs successfully. Used Suspense boundary for useSearchParams in orientation/new page. OpenAI integration gracefully handles missing API key. RAG pipeline uses keyword search for SQLite dev mode with notes for pgvector production migration. Dashboard router extended with announcement CRUD operations. ts-node installed as dev dependency for seed script."
+}

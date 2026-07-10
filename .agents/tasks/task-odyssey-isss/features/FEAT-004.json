@@ -1,0 +1,36 @@
+{
+  "id": "FEAT-004",
+  "type": "feat",
+  "description": "Visa Tracking System and Exchange Programs modules - visa status display with progress bars, document management, predictive expiry reminders, exchange program browsing/filtering, and staff CRUD for programs.",
+  "status": "completed",
+  "steps": [
+    "Create src/server/trpc/routers/visa.ts - visa router: getMyVisa query (student's visa record with documents), getAll query (staff - all student visa records with filters), updateStatus mutation (staff - update visa status/expiry/notes), addDocument mutation (create visa document record with file info), updateDocumentStatus mutation (staff - approve/reject documents), getExpiringVisas query (staff - visas expiring within N days), getDocumentChecklist query (returns required documents based on visa type)",
+    "Create src/app/(dashboard)/visa/page.tsx - Student visa tracking dashboard: Current visa status card with large progress bar visualization (Valid -> Expiring Soon -> Expired states with color transitions green/yellow/red), visa type and expiry date prominently displayed, countdown to expiry, Required Documents Checklist (checkboxes showing submitted/pending/approved/rejected with icons), Upload Document section with drag-drop zone placeholder, Reminders section showing upcoming deadlines (60/30/14/7 day alerts styled as warning/danger cards), History timeline of visa status changes",
+    "Create src/app/(dashboard)/staff/visa/page.tsx - Staff visa management: searchable table of all student visa records, status filter chips, click to view/edit student's visa details, bulk reminder sending capability, expiring soon alert counter at top with colored badges",
+    "Create src/app/(dashboard)/staff/visa/[id]/page.tsx - Staff visa detail for a student: edit visa record (type, status, expiry date, notes), review uploaded documents (approve/reject with comments), document checklist management, add manual status notes",
+    "Create src/lib/visa-utils.ts - utility functions: calculateDaysUntilExpiry, getVisaStatusFromExpiry (auto-calculate VALID/EXPIRING_SOON/EXPIRED based on days), getRequiredDocuments (returns checklist by visa type), formatVisaProgress (percentage for progress bar)",
+    "Create src/server/trpc/routers/exchange.ts - exchange router: getAll query (public - with filters for type/deadline/search, pagination, sort by deadline), getById query, create mutation (staff only - all program fields with Zod validation), update mutation (staff only), archive mutation (staff only - soft archive), getApplications query (staff - see who applied), apply mutation (student applies to program)",
+    "Create src/app/(dashboard)/exchange/page.tsx - Exchange programs browse page: Hero section with 'Explore Global Opportunities' heading, filter bar (type: Academic/Cultural/Mobility, deadline status: active/past, search input), program cards grid (3 columns on desktop) showing title, type badge, brief description, deadline with countdown, eligibility preview, 'Learn More' button with hover scale animation",
+    "Create src/app/(dashboard)/exchange/[id]/page.tsx - Program detail page: full-width hero with program title and type, two-column layout (main content: description, eligibility requirements list, key dates/deadlines, application URL button | sidebar: quick facts card with type/deadline/status, Apply Now CTA, related programs list), back to browse button",
+    "Create src/app/(dashboard)/staff/exchange/page.tsx - Staff exchange management: table view of all programs with status (active/archived), create new program button, inline edit/archive actions, application count per program",
+    "Create src/app/(dashboard)/staff/exchange/new/page.tsx - Create/Edit exchange program form: title, type dropdown, description (rich textarea), eligibility (textarea), deadline (date picker), application URL, save with validation and toast feedback",
+    "Wire up visa and exchange routers in main appRouter",
+    "Verify: npm run build passes"
+  ],
+  "acceptance_criteria": [
+    "Student visa page shows progress bar with color-coded status (green/yellow/red)",
+    "Document checklist shows required documents with status indicators",
+    "Predictive reminders display at 60/30/14/7 days before visa expiry",
+    "Staff can update visa status and approve/reject documents",
+    "Exchange programs page has filterable grid of program cards",
+    "Program detail page shows full info with eligibility and deadlines",
+    "Staff can create, edit, and archive exchange programs",
+    "All tRPC routers have proper Zod validation",
+    "npm run build completes successfully"
+  ],
+  "verification": [
+    "npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": "Build and lint pass cleanly. Used Suspense boundary for useSearchParams in staff/exchange/new page (Next.js 14 requirement for static generation). Exchange router uses z.literal('') as alternate for optional URL validation. Visa progress bar uses percentage mapped from days (0-365 days -> 0-100%). Color thresholds: green for 60+ days, yellow for 14-60 days, red for <14 days."
+}

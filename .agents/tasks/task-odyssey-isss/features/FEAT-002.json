@@ -1,0 +1,35 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Authentication pages (Login/Register) with polished UI, role-based dashboard pages with announcements/quick links/FAQs/notifications, and complete tRPC auth router with registration endpoint.",
+  "status": "completed",
+  "steps": [
+    "Create src/app/(auth)/login/page.tsx - Polished login form with email/password fields, UB ODYSSEY branding (logo area, tagline 'International Student Service System'), remember me checkbox, link to register, form validation with Zod, signIn() call with error handling, loading states with spinner animation, gradient left panel with feature highlights",
+    "Create src/app/(auth)/register/page.tsx - Registration form with firstName, lastName, email, password, confirmPassword, nationality (dropdown with 50+ countries), studentId (optional), role selection (Student default, Staff requires special code), Zod validation, API call to register endpoint, success redirect to login, matching visual design to login page",
+    "Create src/server/trpc/routers/auth.ts - auth router with register mutation (validates input with Zod, hashes password with bcrypt, creates User in DB, returns success), getSession query (returns current session user with role)",
+    "Create src/app/(dashboard)/dashboard/page.tsx for Student role - Welcome greeting with user name, Stats cards row (pending inquiries count, upcoming appointments count, visa status indicator, unread notifications), Recent Announcements section (card list with title/date/preview), Quick Links grid (6 cards linking to each module with icons and descriptions), mini FAQ accordion section",
+    "Create src/app/(dashboard)/staff/dashboard/page.tsx for ISSO Staff role - Staff welcome with role badge, Stats cards (total students, pending inquiries, today's appointments, expiring visas count), Recent Activity feed, Pending Actions section (inquiries needing response, appointments to confirm), System Health indicators",
+    "Create src/server/trpc/routers/dashboard.ts - dashboard router with getStudentStats query (counts for inquiries/appointments/visa/notifications), getStaffStats query (aggregate counts for staff view), getRecentAnnouncements query (latest 5 active announcements)",
+    "Create src/server/trpc/routers/notification.ts - notification router with getAll query (paginated, userId filter), getUnreadCount query, markAsRead mutation, markAllAsRead mutation, create mutation (staff only)",
+    "Create src/components/shared/NotificationDropdown.tsx - dropdown in header showing latest notifications with read/unread states, mark as read on click, 'View All' link, empty state illustration",
+    "Create src/components/shared/AnnouncementCard.tsx - reusable card showing announcement title, content preview, author, date with hover effect and expand capability",
+    "Create middleware.ts in src/ - NextAuth middleware protecting /dashboard/* routes, redirecting unauthenticated users to /login, redirecting authenticated users from /login to /dashboard",
+    "Wire up the auth router and dashboard router in the main appRouter in src/server/trpc/router.ts",
+    "Verify: npm run build passes with all new pages and API routes"
+  ],
+  "acceptance_criteria": [
+    "Login page renders with UB branding, email/password fields, and proper validation messages",
+    "Register page has all required fields with country dropdown and Zod validation",
+    "Registration creates a user in the database with bcrypt-hashed password",
+    "Student dashboard shows stats cards, announcements, and quick links",
+    "Staff dashboard shows different stats and pending actions appropriate for ISSO staff",
+    "Notification dropdown shows unread count badge and notification list",
+    "Middleware protects dashboard routes from unauthenticated access",
+    "npm run build completes successfully"
+  ],
+  "verification": [
+    "npm run build"
+  ],
+  "blocked_reason": null,
+  "findings": "1. Zod v4 uses .issues instead of .errors on ZodError objects - the errors property does not exist in Zod 4.x. 2. Zod v4 .refine() API is otherwise compatible with v3 usage. 3. next-auth/middleware withAuth works well for route protection with custom authorized callback. 4. trpc.useUtils() is the correct way to invalidate queries in tRPC v10 with @tanstack/react-query v4."
+}
